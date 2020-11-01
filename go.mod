@@ -1,0 +1,9 @@
+module resteye
+
+go 1.14
+
+require (
+	github.com/gen2brain/beeep v0.0.0-20200526185328-e9c15c258e28
+	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
+	golang.org/x/sys v0.0.0-20201029080932-201ba4db2418 // indirect
+)
