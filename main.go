@@ -1,16 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/gen2brain/beeep"
+	"github.com/gosuri/uiprogress"
+	"github.com/sqweek/dialog"
 )
 
 func main() {
+
+	printHeader()
 
 	sleepInterval := 60 * 20 // remind every 20minutes
 
@@ -19,14 +21,16 @@ func main() {
 	notifyChan := make(chan interface{})
 	resumeChan := make(chan interface{})
 
-	reader := bufio.NewReader(os.Stdin)
-
 	ticked := 0
+	uiprogress.Start() // start rendering
+	bar := uiprogress.AddBar(sleepInterval).AppendCompleted().PrependElapsed()
+
 	go func() {
 		for range tick.C {
 
 			if ticked != sleepInterval {
 				ticked++
+				bar.Incr()
 				continue
 			}
 
@@ -43,8 +47,11 @@ func main() {
 	for {
 		select {
 		case <-notifyChan:
-			fmt.Print("Press anything for resuming: ")
-			reader.ReadString('\n')
+			answer := dialog.Message("%s", "Do you want to resuming screen timer?").Title("RestEye").YesNo()
+			if !answer {
+				log.Fatal("terminating")
+			}
+			bar = uiprogress.AddBar(sleepInterval).AppendCompleted()
 			resumeChan <- nil
 		}
 	}
@@ -53,4 +60,22 @@ func main() {
 
 func notify(msg string) error {
 	return beeep.Notify("RestEye!", msg, "")
+}
+
+func printHeader() {
+	header := `
+
+	____     ___  _____ ______    ___  __ __    ___ 
+	|    \   /  _]/ ___/|      |  /  _]|  |  |  /  _]
+	|  D  ) /  [_(   \_ |      | /  [_ |  |  | /  [_ 
+	|    / |    _]\__  ||_|  |_||    _]|  ~  ||    _]
+	|    \ |   [_ /  \ |  |  |  |   [_ |___, ||   [_ 
+	|  .  \|     |\    |  |  |  |     ||     ||     |
+	|__|\_||_____| \___|  |__|  |_____||____/ |_____|
+													 
+	
+	Starting timer
+
+	`
+	fmt.Println(header)
 }
