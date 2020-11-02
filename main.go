@@ -51,7 +51,7 @@ func main() {
 			if !answer {
 				log.Fatal("terminating")
 			}
-			bar = uiprogress.AddBar(sleepInterval).AppendCompleted()
+			bar = uiprogress.AddBar(sleepInterval).AppendCompleted().PrependElapsed()
 			resumeChan <- nil
 		}
 	}
