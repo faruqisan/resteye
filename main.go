@@ -6,14 +6,15 @@ import (
 	"time"
 
 	"github.com/gen2brain/beeep"
+	"github.com/gen2brain/dlgs"
 	"github.com/gosuri/uiprogress"
-	"github.com/sqweek/dialog"
 )
 
 func main() {
 
 	printHeader()
 
+	// change the interval, because ticker in second, we times the interval by 60
 	sleepInterval := 60 * 20 // remind every 20minutes
 
 	tick := time.NewTicker(1 * time.Second)
@@ -47,7 +48,10 @@ func main() {
 	for {
 		select {
 		case <-notifyChan:
-			answer := dialog.Message("%s", "Do you want to resuming screen timer?").Title("RestEye").YesNo()
+			answer, err := dlgs.Question("RestEye", "Do you want to resuming screen timer?", true)
+			if err != nil {
+				log.Fatal(err)
+			}
 			if !answer {
 				log.Fatal("terminating")
 			}
